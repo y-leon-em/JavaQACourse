@@ -7,9 +7,8 @@ public enum Menu {
 
     public static Menu fromString(String input) {
         if (input == null) return null;
-        String trimmed = input.trim().toUpperCase();
         try {
-            return Menu.valueOf(trimmed);
+            return Menu.valueOf(input.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
             return null;
         }

@@ -47,25 +47,23 @@ public abstract class Animal {
         System.out.println("Я ем");
     }
 
-    ;
 
     public void drink() {
         System.out.println("Я пью");
     }
 
-    ;
 
     public void go() {
         System.out.println("Я иду");
     }
 
-    ;
+
 
     public void say() {
         System.out.println("Я говорю");
     }
 
-    ;
+
 
 
     @Override

@@ -1,7 +1,5 @@
 package animals;
 
-import service.Menu;
-
 public enum AnimalType {
     CAT, DOG, DUCK;
     public static AnimalType fromString(String input) {
