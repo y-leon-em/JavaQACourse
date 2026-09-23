@@ -6,9 +6,12 @@ public abstract class Animal {
 
     private String name;
     private int age;
+    private int id;
     private double weight;
     private Color color;
-//            = Color.UNDEFINED;
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
 
     public String getName() {
@@ -68,8 +71,8 @@ public abstract class Animal {
 
     @Override
     public String toString() {
-        return String.format("Привет! Меня зовут %s, мне %d %s, я вешу - %.2f кг, мой цвет %s",
-                name, age, toPluralAge(), weight, color.getValue());
+        return String.format("id=%d | Привет! Меня зовут %s, мне %d %s, я вешу - %.2f кг, мой цвет %s",
+                id, name, age, toPluralAge(), weight, color.getValue());
     }
 
 

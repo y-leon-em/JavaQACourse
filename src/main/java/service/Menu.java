@@ -2,6 +2,7 @@ package service;
 
 public enum Menu {
     ADD,
+    UPDATE,
     LIST,
     EXIT;
 
