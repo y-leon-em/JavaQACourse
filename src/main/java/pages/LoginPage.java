@@ -10,6 +10,7 @@ public class LoginPage extends BasePage {
     private final By userNameInput = By.cssSelector("input[type='text']");
     private final By userPasswordInput = By.cssSelector("input[type='password']");
     private final By loginButton = By.cssSelector("button[type='submit']");
+    private final By alertBadge = By.cssSelector("*[class*=alert-danger]");
 
     public LoginPage(WebDriver driver) {
         super(driver);

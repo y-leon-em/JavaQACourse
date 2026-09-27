@@ -30,14 +30,33 @@ public class RegistrationPage extends BasePage {
         return this;
     }
 
+    public RegistrationPage typeUserNameViaJS(String text) {
+        setValueViaJs(userNameInput, text);
+        return this;
+    }
+
     public RegistrationPage typeUserEmail(String text) {
         type(userEmailInput, text);
+        return this;
+    }
+
+    public RegistrationPage typeUserEmailViaJS(String text) {
+        setValueViaJs(userEmailInput, text);
         return this;
     }
 
     public RegistrationPage typeUserPassword(String text) {
         type(userPasswordInput, text);
         return this;
+    }
+
+    public RegistrationPage typeUserPasswordViaJS(String text) {
+        setValueViaJs(userPasswordInput, text);
+        return this;
+    }
+
+    public String getUserPasswordValue() {
+        return getInputValue(userPasswordInput);
     }
 
     public RegistrationPage clickRegistrationButton() {
