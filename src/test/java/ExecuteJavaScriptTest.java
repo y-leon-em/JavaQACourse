@@ -7,12 +7,9 @@ import pages.LoginPage;
 import pages.RegistrationPage;
 import utils.TestDataGenerator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class ExecuteJavaScriptTest extends BaseTest {
 
-    private static final Logger log = LogManager.getLogger(InputTest.class);
+    private static final Logger log = LogManager.getLogger(ExecuteJavaScriptTest.class);
 
     @Test
     @BrowserMode(Mode.FULLSCREEN)
@@ -20,7 +17,6 @@ public class ExecuteJavaScriptTest extends BaseTest {
         final String userName = TestDataGenerator.randomName();
         final String userEmail = TestDataGenerator.randomEmail();
         final String userPassword = TestDataGenerator.randomPassword();
-        final String loginPath = "/login";
 
         LoginPage loginPage = new LoginPage(driver);
         RegistrationPage registrationPage = new RegistrationPage(driver);
@@ -29,13 +25,12 @@ public class ExecuteJavaScriptTest extends BaseTest {
                 .open()
                 .typeUserNameViaJS(userName)
                 .typeUserEmailViaJS(userEmail)
-                .typeUserPasswordViaJS(userPassword);
-        assertEquals(userPassword, registrationPage.getUserPasswordValue(),"Введенный пароль не совпадает с ожидаемым");
-
-        registrationPage
+                .typeUserPasswordViaJS(userPassword)
+                .assertPasswordIs(userPassword)
                 .clickRegistrationButton()
-                .waitForUrlContains(loginPath);
-        assertTrue(loginPage.getUrl().contains(loginPath), "После регистрации не произошел редирект");
+                .waitForUrlContains(loginPage.getPath());
+        loginPage.assertRedirectOnPage();
+
         log.info("Тест пройден успешно");
     }
 }

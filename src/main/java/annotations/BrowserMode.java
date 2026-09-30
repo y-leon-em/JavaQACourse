@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface BrowserMode {
     Mode value();
-    enum Mode { HEADLESS, KIOSK, FULLSCREEN }
+    enum Mode { HEADLESS, KIOSK, FULLSCREEN, MAXIMIZED }
 }

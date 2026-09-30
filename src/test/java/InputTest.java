@@ -5,8 +5,6 @@ import annotations.BrowserMode;
 import annotations.BrowserMode.Mode;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class InputTest extends BaseTest {
 
     private static final Logger log = LogManager.getLogger(InputTest.class);
@@ -14,10 +12,13 @@ public class InputTest extends BaseTest {
     @Test
     @BrowserMode(Mode.HEADLESS)
     void openResourceAndInputText() {
-        LoginPage page = new LoginPage(driver)
+        LoginPage loginPage = new LoginPage(driver);
+
+        loginPage
                 .open()
-                .typeUserName("ОТУС");
-        assertEquals("ОТУС", page.getUserNameValue(), "Введённый текст не совпадает");
+                .typeUserName("ОТУС")
+                .assertUserNameIs("ОТУС");
+
         log.info("Тест пройден успешно");
     }
 }

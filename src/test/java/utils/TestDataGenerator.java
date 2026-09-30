@@ -19,4 +19,12 @@ public final class TestDataGenerator {
     public static String randomPassword() {
         return faker.internet().password();
     }
+
+    public static String randomWishlistTitle() {
+        return faker.commerce().productName();
+    }
+
+    public static String randomWishlistDescription() {
+        return faker.lorem().sentence(5);
+    }
 }
