@@ -1,35 +1,43 @@
 package config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 public final class Config {
 
-    private static final Properties PROPS = new Properties();
-
-    static {
-        try (InputStream in = Config.class.getClassLoader()
-                .getResourceAsStream("config.properties")) {
-            if (in != null) {
-                PROPS.load(in);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Не удалось загрузить config.properties", e);
-        }
-    }
+    private static final String DEFAULT_BASE_URL = "https://wishlist.otus.kartushin.su";
+    private static final int DEFAULT_TIMEOUT_SECONDS = 10;
+    private static final String DEFAULT_BROWSER = "chrome";
 
     private Config() {}
 
-    public static String get(String key) {
-        return System.getProperty(key, PROPS.getProperty(key));
+    /**
+     * Возвращает значение system property или дефолт, если параметр не задан.
+     */
+    private static String resolve(String key, String defaultValue) {
+        String value = System.getProperty(key);
+        return (value == null || value.isBlank()) ? defaultValue : value;
     }
 
+    /**
+     * Базовый URL тестируемого стенда.
+     * Переопределяется через {@code -Dbase.url=...}.
+     */
     public static String baseUrl() {
-        return get("base.url");
+        return resolve("base.url", DEFAULT_BASE_URL);
     }
 
+    /**
+     * Таймаут ожиданий в секундах.
+     * Переопределяется через {@code -Dbrowser.timeout=...}.
+     */
     public static int timeout() {
-        return Integer.parseInt(get("browser.timeout"));
+        return Integer.parseInt(
+                resolve("browser.timeout", String.valueOf(DEFAULT_TIMEOUT_SECONDS)));
+    }
+
+    /**
+     * Имя браузера по умолчанию.
+     * Переопределяется через {@code -Dbrowser=...}.
+     */
+    public static String browser() {
+        return resolve("browser", DEFAULT_BROWSER);
     }
 }

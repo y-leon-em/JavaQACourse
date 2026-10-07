@@ -1,4 +1,5 @@
 import annotations.BrowserMode.Mode;
+import config.Config;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,12 +18,10 @@ public final class BrowserFactory {
 
     private static final Logger log = LogManager.getLogger(BrowserFactory.class);
 
-    private static final String DEFAULT_BROWSER = "chrome";
-
     private BrowserFactory() {}
 
     public static WebDriver create(Mode mode) {
-        String browser = System.getProperty("browser", DEFAULT_BROWSER)
+        String browser = Config.browser()
                 .toLowerCase(Locale.ROOT)
                 .trim();
 
