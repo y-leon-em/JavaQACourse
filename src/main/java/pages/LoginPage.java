@@ -8,12 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoginPage extends BasePage {
-    private static final String PAGE_PATH = "/login";
+    private final String PAGE_PATH = "/login";
 
-    private static final By USER_NAME_INPUT = By.cssSelector("input[type='text']");
-    private static final By USER_PASSWORD_INPUT = By.cssSelector("input[type='password']");
-    private static final By LOGIN_BUTTON = By.cssSelector("button[type='submit']");
-    private static final By ALERT_BADGE = By.cssSelector("*[class*=alert-danger]");
+    private final By USER_NAME_INPUT = By.cssSelector("input[type='text']");
+    private final By USER_PASSWORD_INPUT = By.cssSelector("input[type='password']");
+    private final By LOGIN_BUTTON = By.cssSelector("button[type='submit']");
+    private final By ALERT_BADGE = By.cssSelector("*[class*=alert-danger]");
 
     public LoginPage(WebDriver driver) {
         super(driver);

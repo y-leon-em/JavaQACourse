@@ -8,28 +8,28 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WishListPage extends BasePage {
-    private static final String PAGE_PATH = "/wishlists";
+    private final String PAGE_PATH = "/wishlists";
 
-    private static final By WISHLIST_HEADER = By.xpath("//*[text()='Мои списки желаний']");
-    private static final By CREATE_NEW_LIST_BUTTON = By.xpath("//button[normalize-space()='Создать новый список']");
-    private static final By ALL_CARDS = By.cssSelector(".card");
+    private final By WISHLIST_HEADER = By.xpath("//*[text()='Мои списки желаний']");
+    private final By CREATE_NEW_LIST_BUTTON = By.xpath("//button[normalize-space()='Создать новый список']");
+    private final By ALL_CARDS = By.cssSelector(".card");
     // модальное окно создания списка
-    private static final By DIALOG = By.cssSelector("*[class^=modal-dialog]");
-    private static final By LIST_TITLE_INPUT =By.cssSelector("*[class^=modal-dialog] input[type='text']");
-    private static final By LIST_DESCRIPTION_INPUT = By.cssSelector("*[class^=modal-dialog] textarea");
-    private static final By DIALOG_CANCEL_BUTTON = By.cssSelector("*[class^=modal-dialog] button[type='button']");
-    private static final By DIALOG_CREATE_BUTTON = By.cssSelector("*[class^=modal-dialog] button[type='submit']");
+    private final By DIALOG = By.cssSelector("*[class^=modal-dialog]");
+    private final By LIST_TITLE_INPUT =By.cssSelector("*[class^=modal-dialog] input[type='text']");
+    private final By LIST_DESCRIPTION_INPUT = By.cssSelector("*[class^=modal-dialog] textarea");
+    private final By DIALOG_CANCEL_BUTTON = By.cssSelector("*[class^=modal-dialog] button[type='button']");
+    private final By DIALOG_CREATE_BUTTON = By.cssSelector("*[class^=modal-dialog] button[type='submit']");
 
-    private static final String CARD_BY_NAME =
+    private final String CARD_BY_NAME =
             "//div[contains(@class, 'card')][.//div[contains(@class, 'card-title') and normalize-space()='%s']]";
-    private static final String CARD_BY_UUID =
+    private final String CARD_BY_UUID =
             "//div[contains(@class, 'card')][.//a[contains(@href, '%s')]]";
 
-    private static final String TITLE_WITHIN = ".//div[contains(@class, 'card-title')]";
-    private static final String DESCRIPTION_WITHIN = ".//p[contains(@class, 'card-text')][1]";
-    private static final String GIFT_COUNT_WITHIN = ".//small[contains(@class, 'text-muted')]";
-    private static final String VIEW_LINK_WITHIN = ".//a[contains(@href, '/wishlists/')]";
-    private static final String DELETE_BUTTON_WITHIN = ".//button[contains(@class, 'btn-danger')]";
+    private final String TITLE_WITHIN = ".//div[contains(@class, 'card-title')]";
+    private final String DESCRIPTION_WITHIN = ".//p[contains(@class, 'card-text')][1]";
+    private final String GIFT_COUNT_WITHIN = ".//small[contains(@class, 'text-muted')]";
+    private final String VIEW_LINK_WITHIN = ".//a[contains(@href, '/wishlists/')]";
+    private final String DELETE_BUTTON_WITHIN = ".//button[contains(@class, 'btn-danger')]";
 
     public WishListPage(WebDriver driver) {super(driver);}
 

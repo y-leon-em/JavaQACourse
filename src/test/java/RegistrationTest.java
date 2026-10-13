@@ -8,8 +8,6 @@ import pages.LoginPage;
 import pages.RegistrationPage;
 import utils.TestDataGenerator;
 
-import static components.NavigationBar.registrationLink;
-
 public class RegistrationTest extends BaseTest {
 
     private static final Logger log = LogManager.getLogger(RegistrationTest.class);
@@ -78,8 +76,8 @@ public class RegistrationTest extends BaseTest {
                 .typeUserPassword(userPassword)
                 .clickRegistrationButton()
                 .waitForUrlContains(loginPath);
-        registrationPage.clickOnNavItem(registrationLink);
         registrationPage
+                .goToRegistration()
                 .typeUserName(userName)
                 .typeUserEmail(userEmail)
                 .typeUserPassword(userPassword)

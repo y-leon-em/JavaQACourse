@@ -15,6 +15,10 @@ public abstract class BasePage {
     final WebDriverWait wait;
     final JavascriptExecutor js;
 
+    private final By LOGIN_LINK = By.cssSelector("nav a[href='/login']");
+    private final By REGISTRATION_LINK = By.cssSelector("nav a[href='/register']");
+    private final By WISHLISTS_LINK = By.cssSelector("nav a[href='/wishlists']");
+
     BasePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(Config.timeout()));
@@ -49,6 +53,30 @@ public abstract class BasePage {
 
     public void openPage() {
         driver.get(Config.baseUrl() + getPath());
+    }
+
+    /**
+     * Переходит на страницу логина через навигацию.
+     */
+    public LoginPage goToLogin() {
+        wait.until(ExpectedConditions.elementToBeClickable(LOGIN_LINK)).click();
+        return new LoginPage(driver);
+    }
+
+    /**
+     * Переходит на страницу регистрации через навигацию.
+     */
+    public RegistrationPage goToRegistration() {
+        wait.until(ExpectedConditions.elementToBeClickable(REGISTRATION_LINK)).click();
+        return new RegistrationPage(driver);
+    }
+
+    /**
+     * Переходит на список желаний через навигацию.
+     */
+    public WishListPage goToWishlists() {
+        wait.until(ExpectedConditions.elementToBeClickable(WISHLISTS_LINK)).click();
+        return new WishListPage(driver);
     }
 
     /**
