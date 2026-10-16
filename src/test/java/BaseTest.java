@@ -1,11 +1,12 @@
 import annotations.BrowserMode;
+import annotations.BrowserMode.Mode;
+import factory.BrowserModeFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
 import org.openqa.selenium.WebDriver;
-import annotations.BrowserMode.Mode;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 public abstract class BaseTest {
@@ -23,7 +24,7 @@ public abstract class BaseTest {
                 .map(BrowserMode::value)
                 .orElse(Mode.HEADLESS);
 
-        driver = BrowserFactory.create(mode);
+        driver = BrowserModeFactory.create(mode);
 
         log.debug("Драйвер запущен, sessionId={}",
                 ((RemoteWebDriver) driver).getSessionId());
@@ -34,6 +35,7 @@ public abstract class BaseTest {
         log.info("Завершение теста, закрытие драйвера");
         if (driver != null) {
             driver.quit();
+            driver = null;
         }
     }
 }

@@ -1,40 +1,36 @@
+package factory;
+
 import annotations.BrowserMode.Mode;
 import config.Config;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.chromium.ChromiumOptions;
-import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.util.Locale;
 
-public final class BrowserFactory {
+public final class BrowserModeFactory {
 
-    private static final Logger log = LogManager.getLogger(BrowserFactory.class);
+    private static final Logger log = LogManager.getLogger(BrowserModeFactory.class);
 
-    private BrowserFactory() {}
+    private BrowserModeFactory() {}
 
+    /**
+     * Создаёт WebDriver с браузером из конфига и указанным режимом окна.
+     *
+     * @param mode режим окна (HEADLESS, KIOSK, FULLSCREEN, MAXIMIZED)
+     * @return экземпляр WebDriver
+     */
     public static WebDriver create(Mode mode) {
-        String browser = Config.browser()
-                .toLowerCase(Locale.ROOT)
-                .trim();
-
+        String browser = Config.browser().toLowerCase(Locale.ROOT).trim();
         log.info("Инициализация браузера: {}, режим: {}", browser, mode);
 
-        WebDriver driver = switch (browser) {
-            case "firefox" -> createFirefox(mode);
-            case "edge"    -> createEdge(mode);
-            case "chrome"  -> createChrome(mode);
-            default -> throw new IllegalArgumentException(
-                    "Неподдерживаемый браузер: '" + browser + "'. " +
-                            "Допустимые значения: chrome, firefox, edge");
-        };
+        Capabilities options = buildOptions(browser, mode);
+        WebDriver driver = WebDriverFactory.create(browser, options);
 
         if (mode == Mode.MAXIMIZED) {
             driver.manage().window().maximize();
@@ -43,25 +39,28 @@ public final class BrowserFactory {
         return driver;
     }
 
-    private static WebDriver createChrome(Mode mode) {
-        WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-        applyChromiumMode(options, mode);
-        return new ChromeDriver(options);
-    }
-
-    private static WebDriver createEdge(Mode mode) {
-        WebDriverManager.edgedriver().setup();
-        EdgeOptions options = new EdgeOptions();
-        applyChromiumMode(options, mode);
-        return new EdgeDriver(options);
-    }
-
-    private static WebDriver createFirefox(Mode mode) {
-        WebDriverManager.firefoxdriver().setup();
-        FirefoxOptions options = new FirefoxOptions();
-        applyFirefoxMode(options, mode);
-        return new FirefoxDriver(options);
+    /**
+     * Собирает опции браузера с учётом режима.
+     */
+    private static Capabilities buildOptions(String browser, Mode mode) {
+        return switch (browser) {
+            case "firefox" -> {
+                FirefoxOptions opts = new FirefoxOptions();
+                applyFirefoxMode(opts, mode);
+                yield opts;
+            }
+            case "edge" -> {
+                EdgeOptions opts = new EdgeOptions();
+                applyChromiumMode(opts, mode);
+                yield opts;
+            }
+            case "chrome" -> {
+                ChromeOptions opts = new ChromeOptions();
+                applyChromiumMode(opts, mode);
+                yield opts;
+            }
+            default -> null;
+        };
     }
 
     private static void applyChromiumMode(ChromiumOptions<?> options, Mode mode) {
