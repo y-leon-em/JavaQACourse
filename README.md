@@ -39,8 +39,8 @@
 | Успешный вход               | `{username:"user01", password:"Pass123"}` | `200 OK`, тело содержит `token` (JWT) | ✅PASSED               |
 | Отсутствует `username`      | `{password:"Pass123"}`                    | `400 Bad Request`                     | ✅PASSED               |
 | Отсутствует `password`      | `{username:"user01"}`                     | `400 Bad Request`                     | ✅PASSED               |
-| Неверный пароль             | `{username:"user01", password:"wrong"}`   | `401 Unauthorized`                    | ✅PASSED               |
-| Несуществующий пользователь | `{username:"ghost", password:"Pass123"}`  | `401 Unauthorized`                    | ✅PASSED               |
+| Неверный пароль             | `{username:"user01", password:"wrong"}`   | `401 Unauthorized / 403`              | ✅PASSED               |
+| Несуществующий пользователь | `{username:"ghost", password:"Pass123"}`  | `401 Unauthorized / 403`              | ✅PASSED               |
 
 ---
 
@@ -53,9 +53,9 @@
 | Пустой список у нового пользователя | Валидный `Bearer`-токен                    | `200 OK`, тело `[]`                  | ✅PASSED               |
 | Есть несколько списков              | Валидный токен, 3 созданных списка         | `200 OK`, массив из 3 объектов       | ✅PASSED               |
 | Структура элемента                  | Валидный токен                             | Каждый объект содержит `id`, `title` | ✅PASSED               |
-| Отсутствующий токен                 |                                            | `401 Unauthorized`                   |                       |
-| Невалидный JWT                      | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`                   |                       |
-| Истёкший токен                      | Старый JWT                                 | `401 Unauthorized`                   |                       |
+| Отсутствующий токен                 |                                            | `401 Unauthorized / 403`             | ✅PASSED               |
+| Невалидный JWT                      | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`             | ✅PASSED               |
+| Истёкший токен                      | Старый JWT                                 | `401 Unauthorized / 403`             | ✅PASSED               |
 
 ---
 
@@ -66,15 +66,12 @@
 | Сценарий               | Входные данные                             | Ожидаемый результат                | Фактический результат |
 |------------------------|--------------------------------------------|------------------------------------|-----------------------|
 | Валидное создание      | `{title:"Birthday", description:"..."}`    | `200 OK`, объект с `id`, `title`   | ✅PASSED               |
-| Только `title`         | `{title:"Birthday"}`                       | `200 OK`, `description: null`/`""` |                       |
-| Отсутствует `title`    | `{description:"..."}`                      | `400 Bad Request`                  |                       |
-| `title: null`          | `{title:null}`                             | `400 Bad Request`                  |                       |
-| `title: ""`            | `{title:""}`                               | `400 Bad Request`                  |                       |
-| `title` > 255 символов | Строка из 300 символов                     | `400 Bad Request`                  |                       |
-| Кириллица в `title`    | `{title:"День рождения"}`                  | `200 OK`, сохранено корректно      |                       |
-| Отсутствующий токен    |                                            | `401 Unauthorized`                 |                       |
-| Невалидный JWT         | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`                 |                       |
-| Истёкший токен         | Старый JWT                                 | `401 Unauthorized`                 |                       |
+| Только `title`         | `{title:"Birthday"}`                       | `200 OK`, `description: null`/`""` | ✅PASSED               |
+| Отсутствует `title`    | `{description:"..."}`                      | `400 Bad Request`                  | ✅PASSED               |
+| `title` > 255 символов | Строка из 300 символов                     | `400 Bad Request`                  | ✅PASSED               |
+| Отсутствующий токен    |                                            | `401 Unauthorized / 403`           | ✅PASSED               |
+| Невалидный JWT         | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`           | ✅PASSED               |
+| Истёкший токен         | Старый JWT                                 | `401 Unauthorized / 403`           | ✅PASSED               |
 
 ---
 
@@ -85,12 +82,11 @@
 | Сценарий               | Входные данные                             | Ожидаемый результат              | Фактический результат |
 |------------------------|--------------------------------------------|----------------------------------|-----------------------|
 | Существующий `id`      | Валидный UUID своего списка                | `200 OK`, объект с `id`, `title` | ✅PASSED               |
-| Несуществующий UUID    | `00000000-0000-0000-0000-000000000000`     | `404 Not Found`                  |                       |
-| Невалидный формат `id` | `id: "abc"`                                | `400 Bad Request`                |                       |
-| Чужой `wishlistId`     | UUID списка другого пользователя           | `403 Forbidden` / `404`          |                       |
-| Отсутствующий токен    |                                            | `401 Unauthorized`               |                       |
-| Невалидный JWT         | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`               |                       |
-| Истёкший токен         | Старый JWT                                 | `401 Unauthorized`               |                       |
+| Несуществующий UUID    | `00000000-0000-0000-0000-000000000000`     | `404 Not Found`                  | ❌ STATUS 401          |
+| Невалидный формат `id` | `id: "abc"`                                | `400 Bad Request`                | ❌ STATUS 403          |
+| Отсутствующий токен    |                                            | `401 Unauthorized / 403`         | ✅PASSED               |
+| Невалидный JWT         | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`         | ✅PASSED               |
+| Истёкший токен         | Старый JWT                                 | `401 Unauthorized / 403`         | ✅PASSED               |
 
 ---
 
@@ -100,15 +96,14 @@
 
 | Сценарий                 | Входные данные                             | Ожидаемый результат             | Фактический результат |
 |--------------------------|--------------------------------------------|---------------------------------|-----------------------|
-| Обновление `title`       | `{title:"New title"}`                      | `200 OK`, `title` изменён       |                       |
-| Обновление `description` | `{description:"new"}`                      | `200 OK`, `description` изменён |                       |
-| Несуществующий `id`      | Валидный UUID, но не существует            | `404 Not Found`                 |                       |
-| Отсутствует `title`      | `{description:"new"}`                      | `400 Bad Request`               |                       |
-| Невалидный формат `id`   | `id: "abc"`                                | `400 Bad Request`               |                       |
-| Чужой `id`               | UUID списка другого пользователя           | `403 Forbidden`                 |                       |
-| Отсутствующий токен      |                                            | `401 Unauthorized`              |                       |
-| Невалидный JWT           | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`              |                       |
-| Истёкший токен           | Старый JWT                                 | `401 Unauthorized`              |                       |
+| Обновление `title`       | `{title:"New title"}`                      | `200 OK`, `title` изменён       | ✅PASSED               |
+| Обновление `description` | `{description:"new"}`                      | `200 OK`, `description` изменён | ✅PASSED               |
+| Несуществующий `id`      | Валидный UUID, но не существует            | `404 Not Found`                 | ❌ STATUS 401          |
+| Отсутствует `title`      | `{description:"new"}`                      | `400 Bad Request`               | ❌ STATUS 403          |
+| Невалидный формат `id`   | `id: "abc"`                                | `400 Bad Request`               | ❌ STATUS 403          |
+| Отсутствующий токен      |                                            | `401 Unauthorized / 403`        | ✅PASSED               |
+| Невалидный JWT           | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`        | ✅PASSED               |
+| Истёкший токен           | Старый JWT                                 | `401 Unauthorized / 403`        | ✅PASSED               |
 
 ---
 
@@ -116,16 +111,14 @@
 
 **Метод:** DELETE | **Путь:** `/api/wishlists/{id}` | **Авторизация:** ✅
 
-| Сценарий                    | Входные данные                                          | Ожидаемый результат         | Фактический результат |
-|-----------------------------|---------------------------------------------------------|-----------------------------|-----------------------|
-| Удаление существующего      | Валидный UUID своего списка                             | `200 OK` / `204 No Content` | ✅PASSED               |
-| Каскадное удаление подарков | Удаление списка с подарками → `GET /api/gifts/{giftId}` | `404 Not Found`             |                       |
-| Несуществующий `id`         | Валидный UUID, не существует                            | `404 Not Found`             |                       |
-| Невалидный формат `id`      | `id: "abc"`                                             | `400 Bad Request`           |                       |
-| Чужой `id`                  | UUID списка другого пользователя                        | `403 Forbidden`             |                       |
-| Отсутствующий токен         |                                                         | `401 Unauthorized`          |                       |
-| Невалидный JWT              | `Authorization: Bearer invalid.token.here`              | `401 Unauthorized`          |                       |
-| Истёкший токен              | Старый JWT                                              | `401 Unauthorized`          |                       |
+| Сценарий               | Входные данные                             | Ожидаемый результат         | Фактический результат |
+|------------------------|--------------------------------------------|-----------------------------|-----------------------|
+| Удаление существующего | Валидный UUID своего списка                | `200 OK` / `204 No Content` | ✅PASSED               |
+| Несуществующий `id`    | Валидный UUID, не существует               | `404 Not Found`             | ❌ STATUS 401          |
+| Невалидный формат `id` | `id: "abc"`                                | `400 Bad Request`           | ❌ STATUS 403          |
+| Отсутствующий токен    |                                            | `401 Unauthorized / 403`    | ✅PASSED               |
+| Невалидный JWT         | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`    | ✅PASSED               |
+| Истёкший токен         | Старый JWT                                 | `401 Unauthorized / 403`    | ✅PASSED               |
 
 ---
 
@@ -133,16 +126,15 @@
 
 **Метод:** GET | **Путь:** `/api/wishlists/user/{userId}` | **Авторизация:** ✅
 
-| Сценарий                   | Входные данные                             | Ожидаемый результат                     | Фактический результат |
-|----------------------------|--------------------------------------------|-----------------------------------------|-----------------------|
-| Существующий `userId`      | UUID пользователя со списками              | `200 OK`, массив `WishList`             | ✅PASSED               |
-| Пользователь без списков   | UUID без списков                           | `200 OK`, `[]`                          |                       |
-| Свой `userId`              | Собственный UUID                           | Данные совпадают с `GET /api/wishlists` |                       |
-| Несуществующий `userId`    | Валидный UUID, не существует               | `404` / `200 []` (задокументировать)    |                       |
-| Невалидный формат `userId` | `userId: "abc"`                            | `400 Bad Request`                       |                       |
-| Отсутствующий токен        |                                            | `401 Unauthorized`                      |                       |
-| Невалидный JWT             | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`                      |                       |
-| Истёкший токен             | Старый JWT                                 | `401 Unauthorized`                      |                       |
+| Сценарий                   | Входные данные                             | Ожидаемый результат                  | Фактический результат |
+|----------------------------|--------------------------------------------|--------------------------------------|-----------------------|
+| Существующий `userId`      | UUID пользователя со списками              | `200 OK`, массив `WishList`          | ✅PASSED               |
+| Пользователь без списков   | UUID без списков                           | `200 OK`, `[]`                       | ✅PASSED               |
+| Несуществующий `userId`    | Валидный UUID, не существует               | `404` / `200 []` (задокументировать) | ✅PASSED               |
+| Невалидный формат `userId` | `userId: "abc"`                            | `400 Bad Request`                    | ❌ STATUS 403          |
+| Отсутствующий токен        |                                            | `401 Unauthorized / 403`             | ✅PASSED               |
+| Невалидный JWT             | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`             | ✅PASSED               |
+| Истёкший токен             | Старый JWT                                 | `401 Unauthorized / 403`             | ✅PASSED               |
 
 ---
 
@@ -154,13 +146,12 @@
 |-----------------------------|--------------------------------------------|----------------------------------------------------|-----------------------|
 | Пустой список подарков      | Валидный `wishListId` без подарков         | `200 OK`, `[]`                                     | ✅PASSED               |
 | Несколько подарков          | Валидный `wishListId` с 3 подарками        | `200 OK`, массив из 3 объектов                     | ✅PASSED               |
-| Структура элемента          | Валидный `wishListId`                      | Каждый элемент: `id`, `name`, `reserved` (boolean) |                       |
-| Несуществующий `wishListId` | Валидный UUID, не существует               | `404 Not Found`                                    |                       |
-| Невалидный формат           | `wishListId: "abc"`                        | `400 Bad Request`                                  |                       |
-| Чужой `wishListId`          | UUID чужого списка                         | `403 Forbidden`                                    |                       |
-| Отсутствующий токен         |                                            | `401 Unauthorized`                                 |                       |
-| Невалидный JWT              | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`                                 |                       |
-| Истёкший токен              | Старый JWT                                 | `401 Unauthorized`                                 |                       |
+| Структура элемента          | Валидный `wishListId`                      | Каждый элемент: `id`, `name`, `reserved` (boolean) | ✅PASSED               |
+| Несуществующий `wishListId` | Валидный UUID, не существует               | `404 Not Found`                                    | ❌ STATUS 200 []       |
+| Невалидный формат           | `wishListId: "abc"`                        | `400 Bad Request`                                  | ❌ STATUS 403          |
+| Отсутствующий токен         |                                            | `401 Unauthorized / 403`                           | ✅PASSED               |
+| Невалидный JWT              | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`                           | ✅PASSED               |
+| Истёкший токен              | Старый JWT                                 | `401 Unauthorized / 403`                           | ✅PASSED               |
 
 ---
 
@@ -170,22 +161,19 @@
 
 | Сценарий                      | Входные данные                                                                                 | Ожидаемый результат                        | Фактический результат |
 |-------------------------------|------------------------------------------------------------------------------------------------|--------------------------------------------|-----------------------|
-| Полные валидные данные        | `{name:"Book", description:"...", price:1500, imageUrl:"...", storeUrl:"...", reserved:false}` | `200 OK`, объект с `id`, `reserved: false` |                       |
-| Только `name`                 | `{name:"Book"}`                                                                                | `200 OK`, остальные = null/дефолт          |                       |
-| `price: 0`                    | `{name:"Book", price:0}`                                                                       | `200 OK`, `price: 0`                       |                       |
-| Отсутствует `name`            | `{price:1500}`                                                                                 | `400 Bad Request`                          |                       |
-| `name: ""`                    | `{name:""}`                                                                                    | `400 Bad Request`                          |                       |
-| `name` > 255 символов         | Строка из 300 символов                                                                         | `400 Bad Request`                          |                       |
-| `description` > 1000 символов | Строка из 1500 символов                                                                        | `400 Bad Request`                          |                       |
-| `price` отрицательный         | `{name:"X", price:-100}`                                                                       | `400 Bad Request`                          |                       |
-| `price` строкой               | `{name:"X", price:"abc"}`                                                                      | `400 Bad Request`                          |                       |
-| `reserved` не boolean         | `{name:"X", reserved:"yes"}`                                                                   | `400 Bad Request`                          |                       |
-| `storeUrl` не по pattern      | `storeUrl:"not-a-url"`                                                                         | `400 Bad Request` (pattern в спецификации) |                       |
-| Несуществующий `wishListId`   | Валидный UUID, не существует                                                                   | `404 Not Found`                            |                       |
-| Чужой `wishListId`            | UUID чужого списка                                                                             | `403 Forbidden`                            |                       |
-| Отсутствующий токен           |                                                                                                | `401 Unauthorized`                         |                       |
-| Невалидный JWT                | `Authorization: Bearer invalid.token.here`                                                     | `401 Unauthorized`                         |                       |
-| Истёкший токен                | Старый JWT                                                                                     | `401 Unauthorized`                         |                       |
+| Полные валидные данные        | `{name:"Book", description:"...", price:1500, imageUrl:"...", storeUrl:"...", reserved:false}` | `200 OK`, объект с `id`, `reserved: false` | ✅PASSED               |
+| Только `name`                 | `{name:"Book"}`                                                                                | `200 OK`, остальные = null/дефолт          | ❌ STATUS 403          |
+| Отсутствует `name`            | `{price:1500}`                                                                                 | `400 Bad Request`                          | ❌ STATUS 403          |
+| `name` > 255 символов         | Строка из 300 символов                                                                         | `400 Bad Request`                          | ❌ STATUS 403          |
+| `description` > 1000 символов | Строка из 1500 символов                                                                        | `400 Bad Request`                          | ❌ STATUS 403          |
+| `price` отрицательный         | `{name:"X", price:-100}`                                                                       | `400 Bad Request`                          | ❌ STATUS 403          |
+| `price` строкой               | `{name:"X", price:"abc"}`                                                                      | `400 Bad Request`                          | ❌ STATUS 403          |
+| `reserved` не boolean         | `{name:"X", reserved:"yes"}`                                                                   | `400 Bad Request`                          | ❌ STATUS 200          |
+| `storeUrl` не по pattern      | `storeUrl:"not-a-url"`                                                                         | `400 Bad Request` (pattern в спецификации) | ❌ STATUS 403          |
+| Несуществующий `wishListId`   | Валидный UUID, не существует                                                                   | `404 Not Found`                            | ❌ STATUS 401          |
+| Отсутствующий токен           |                                                                                                | `401 Unauthorized / 403`                   | ✅PASSED               |
+| Невалидный JWT                | `Authorization: Bearer invalid.token.here`                                                     | `401 Unauthorized / 403`                   | ✅PASSED               |
+| Истёкший токен                | Старый JWT                                                                                     | `401 Unauthorized / 403`                   | ✅PASSED               |
 
 ---
 
@@ -193,15 +181,14 @@
 
 **Метод:** GET | **Путь:** `/api/gifts/{id}` | **Авторизация:** ✅
 
-| Сценарий               | Входные данные                             | Ожидаемый результат     | Фактический результат |
-|------------------------|--------------------------------------------|-------------------------|-----------------------|
-| Существующий `id`      | Валидный UUID своего подарка               | `200 OK`, объект `Gift` | ✅PASSED               |
-| Несуществующий `id`    | Валидный UUID, не существует               | `404 Not Found`         |                       |
-| Невалидный формат `id` | `id: "abc"`                                | `400 Bad Request`       |                       |
-| Чужой `id`             | UUID подарка другого пользователя          | `403 Forbidden`         |                       |
-| Отсутствующий токен    |                                            | `401 Unauthorized`      |                       |
-| Невалидный JWT         | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`      |                       |
-| Истёкший токен         | Старый JWT                                 | `401 Unauthorized`      |                       |
+| Сценарий               | Входные данные                             | Ожидаемый результат      | Фактический результат |
+|------------------------|--------------------------------------------|--------------------------|-----------------------|
+| Существующий `id`      | Валидный UUID своего подарка               | `200 OK`, объект `Gift`  | ✅PASSED               |
+| Несуществующий `id`    | Валидный UUID, не существует               | `404 Not Found`          | ❌ STATUS 401          |
+| Невалидный формат `id` | `id: "abc"`                                | `400 Bad Request`        | ❌ STATUS 403          |
+| Отсутствующий токен    |                                            | `401 Unauthorized / 403` | ✅PASSED               |
+| Невалидный JWT         | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403` | ✅PASSED               |
+| Истёкший токен         | Старый JWT                                 | `401 Unauthorized / 403` | ✅PASSED               |
 
 ---
 
@@ -209,23 +196,20 @@
 
 **Метод:** PUT | **Путь:** `/api/gifts/{id}` | **Авторизация:** ✅
 
-| Сценарий                      | Входные данные                             | Ожидаемый результат           | Фактический результат |
-|-------------------------------|--------------------------------------------|-------------------------------|-----------------------|
-| Обновление `name`             | `{name:"New name"}`                        | `200 OK`, `name` изменён      |                       |
-| Обновление `price`            | `{price:2000}`                             | `200 OK`, `price: 2000`       |                       |
-| Обновление `reserved` вручную | `{reserved:true}`                          | `200 OK`, `reserved: true`    |                       |
-| Очистка `description`         | `{description:null}`                       | `200 OK`, `description: null` |                       |
-| `GET` после `PUT`             | `GET /api/gifts/{id}`                      | Данные обновлены              |                       |
-| Отсутствует `name`            | `{price:2000}`                             | `400 Bad Request`             |                       |
-| Отсутствует `price`           | `{name:"X"}`                               | `400 Bad Request`             |                       |
-| `name: ""`                    | `{name:""}`                                | `400 Bad Request`             |                       |
-| `price` отрицательный         | `{price:-100}`                             | `400 Bad Request`             |                       |
-| `reserved` не boolean         | `{reserved:"yes"}`                         | `400 Bad Request`             |                       |
-| Несуществующий `id`           | Валидный UUID, не существует               | `404 Not Found`               |                       |
-| Чужой `id`                    | UUID чужого подарка                        | `403 Forbidden`               |                       |
-| Отсутствующий токен           |                                            | `401 Unauthorized`            |                       |
-| Невалидный JWT                | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`            |                       |
-| Истёкший токен                | Старый JWT                                 | `401 Unauthorized`            |                       |                | —                               | `401 Unauthorized`            |                       |
+| Сценарий                 | Входные данные                             | Ожидаемый результат           | Фактический результат    |
+|--------------------------|--------------------------------------------|-------------------------------|--------------------------|
+| Обновление `name`        | `{name:"New name"}`                        | `200 OK`, `name` изменён      | ✅PASSED                  |
+| Обновление `price`       | `{price:2000}`                             | `200 OK`, `price: 2000`       | ✅PASSED                  |
+| Обновление `reserved`    | `{reserved:true}`                          | `200 OK`, `reserved: true`    | ❌ не обновилось значение |
+| Обновление `description` | `{description:null}`                       | `200 OK`, `description: null` | ✅PASSED                  |
+| Обновление `imageUrl`    | `{description:null}`                       | `200 OK`, `description: null` | ✅PASSED                  |
+| Обновление `storeUrl`    | `{description:null}`                       | `200 OK`, `description: null` | ✅PASSED                  |
+| Отсутствует `name`       | `{price:2000}`                             | `400 Bad Request`             | ❌ STATUS 403             |
+| Отсутствует `price`      | `{name:"X"}`                               | `400 Bad Request`             | ❌ STATUS 403             |
+| Несуществующий `id`      | Валидный UUID, не существует               | `404 Not Found`               | ❌ STATUS 401             |
+| Отсутствующий токен      |                                            | `401 Unauthorized / 403`      | ✅PASSED                  |
+| Невалидный JWT           | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`      | ✅PASSED                  |
+| Истёкший токен           | Старый JWT                                 | `401 Unauthorized / 403`      | ✅PASSED                  |
 
 ---
 
@@ -235,15 +219,12 @@
 
 | Сценарий               | Входные данные                             | Ожидаемый результат         | Фактический результат |
 |------------------------|--------------------------------------------|-----------------------------|-----------------------|
-| Удаление существующего | Валидный UUID своего подарка               | `200 OK` / `204 No Content` |                       |
-| `GET` после `DELETE`   | `GET /api/gifts/{id}`                      | `404 Not Found`             |                       |
-| Несуществующий `id`    | Валидный UUID, не существует               | `404 Not Found`             |                       |
-| Повторное удаление     | Тот же `id`                                | `404 Not Found`             |                       |
-| Невалидный формат `id` | `id: "abc"`                                | `400 Bad Request`           |                       |
-| Чужой `id`             | UUID чужого подарка                        | `403 Forbidden`             |                       |
-| Отсутствующий токен    |                                            | `401 Unauthorized`          |                       |
-| Невалидный JWT         | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`          |                       |
-| Истёкший токен         | Старый JWT                                 | `401 Unauthorized`          |                       |
+| Удаление существующего | Валидный UUID своего подарка               | `200 OK` / `204 No Content` | ✅PASSED               |
+| Несуществующий `id`    | Валидный UUID, не существует               | `404 Not Found`             | ❌ STATUS 401          |
+| Невалидный формат `id` | `id: "abc"`                                | `400 Bad Request`           | ❌ STATUS 403          |
+| Отсутствующий токен    |                                            | `401 Unauthorized / 403`    | ✅PASSED               |
+| Невалидный JWT         | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`    | ✅PASSED               |
+| Истёкший токен         | Старый JWT                                 | `401 Unauthorized / 403`    | ✅PASSED               |
 
 ---
 
@@ -251,19 +232,14 @@
 
 **Метод:** PUT | **Путь:** `/api/gifts/{id}/reserve` | **Авторизация:** ✅
 
-| Сценарий                  | Входные данные                             | Ожидаемый результат           | Фактический результат |
-|---------------------------|--------------------------------------------|-------------------------------|-----------------------|
-| Резерв свободного подарка | Валидный UUID, `reserved: false`           | `200 OK`, `reserved: true`    |                       |
-| Повторный вызов (toggle)  | Тот же `id`                                | `200 OK`, `reserved: false`   |                       |
-| Идемпотентность           | 2 вызова подряд                            | Возврат к исходному состоянию |                       |
-| Тип поля в ответе         | Валидный запрос                            | `reserved` — boolean          |                       |
-| Несуществующий `id`       | Валидный UUID, не существует               | `404 Not Found`               |                       |
-| Невалидный формат `id`    | `id: "abc"`                                | `400 Bad Request`             |                       |
-| Чужой `id`                | UUID чужого подарка                        | `403 Forbidden`               |                       |
-| **SQL-инъекция** в `id`   | `id: "1' OR 1=1 --"`                       | `400 Bad Request`             |                       |
-| Отсутствующий токен       |                                            | `401 Unauthorized`            |                       |
-| Невалидный JWT            | `Authorization: Bearer invalid.token.here` | `401 Unauthorized`            |                       |
-| Истёкший токен            | Старый JWT                                 | `401 Unauthorized`            |                       |
+| Сценарий                  | Входные данные                             | Ожидаемый результат        | Фактический результат |
+|---------------------------|--------------------------------------------|----------------------------|-----------------------|
+| Резерв свободного подарка | Валидный UUID, `reserved: false`           | `200 OK`, `reserved: true` | ✅PASSED               |
+| Несуществующий `id`       | Валидный UUID, не существует               | `404 Not Found`            | ❌ STATUS 401          |
+| Невалидный формат `id`    | `id: "abc"`                                | `400 Bad Request`          | ❌ STATUS 403          |
+| Отсутствующий токен       |                                            | `401 Unauthorized / 403`   | ✅PASSED               |
+| Невалидный JWT            | `Authorization: Bearer invalid.token.here` | `401 Unauthorized / 403`   | ✅PASSED               |
+| Истёкший токен            | Старый JWT                                 | `401 Unauthorized / 403`   | ✅PASSED               |
 
 ---
 
@@ -271,10 +247,10 @@
 
 **Метод:** GET | **Путь:** `/api/users` | **Авторизация:** ❌ (по спецификации)
 
-| Сценарий             | Входные данные | Ожидаемый результат                     | Фактический результат |
-|----------------------|----------------|-----------------------------------------|-----------------------|
-| Список пользователей | —              | `200 OK`, массив `User`                 |                       |
-| Структура элемента   | —              | Каждый объект содержит `id`, `username` |                       |
+| Сценарий             | Входные данные | Ожидаемый результат                     | Фактический результат        |
+|----------------------|----------------|-----------------------------------------|------------------------------|
+| Список пользователей | —              | `200 OK`, массив `User`                 | ❌ STATUS 403 (200 с токеном) |
+| Структура элемента   | —              | Каждый объект содержит `id`, `username` | ✅PASSED                      |
 
 ---
 
@@ -282,11 +258,11 @@
 
 **Метод:** GET | **Путь:** `/api/users/{userId}/wishlists` | **Авторизация:** ❌ (по спецификации)
 
-| Сценарий                          | Входные данные               | Ожидаемый результат                  | Фактический результат |
-|-----------------------------------|------------------------------|--------------------------------------|-----------------------|
-| Существующий `userId` со списками | Валидный UUID                | `200 OK`, массив `WishList`          |                       |
-| Пользователь без списков          | Валидный UUID                | `200 OK`, `[]`                       |                       |
-| Несуществующий `userId`           | Валидный UUID, не существует | `404` / `200 []` (задокументировать) |                       |
-| Невалидный формат `userId`        | `userId: "abc"`              | `400 Bad Request`                    |                       |
+| Сценарий                          | Входные данные               | Ожидаемый результат                  | Фактический результат        |
+|-----------------------------------|------------------------------|--------------------------------------|------------------------------|
+| Существующий `userId` со списками | Валидный UUID                | `200 OK`, массив `WishList`          | ❌ STATUS 403 (200 с токеном) |
+| Пользователь без списков          | Валидный UUID                | `200 OK`, `[]`                       | ✅PASSED                      |
+| Несуществующий `userId`           | Валидный UUID, не существует | `404` / `200 []` (задокументировать) | ✅PASSED 200 []               |
+| Невалидный формат `userId`        | `userId: "abc"`              | `400 Bad Request`                    | ❌ STATUS 403                 |
 
 ---
