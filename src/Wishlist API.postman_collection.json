@@ -1,0 +1,830 @@
+{
+  "info": {
+    "_postman_id": "573f0649-4cb2-4ef6-b95f-3b256a4cda13",
+    "name": "WishList API",
+    "description": "Коллекция запросов для API WishList с автотестами (assertions) для каждого эндпоинта",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59011637",
+    "_collection_link": "https://go.postman.co/collection/59011637-573f0649-4cb2-4ef6-b95f-3b256a4cda13?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Аутентификация",
+      "item": [
+        {
+          "name": "Регистрация нового пользователя",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response time is less than 2000ms\", function () {\n    pm.expect(pm.response.responseTime).to.be.below(2000);\n});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  " pm.globals.set(\"email\", pm.variables.replaceIn('{{$randomEmail}}'));\n pm.globals.set(\"username\", pm.variables.replaceIn('{{$randomUserName}}'));\npm.globals.set(\"password\", pm.variables.replaceIn('{{$randomPassword}}'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Авторизация пользователя",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Body contains token (or accessToken)\", function () {\n    const json = pm.response.json();\n    const token = json.token || json.accessToken || json.access_token;\n    pm.expect(token, \"token should be present\").to.not.be.undefined;\n    pm.expect(token).to.be.a(\"string\").and.not.empty;\n});\n\nconst json = pm.response.json();\nconst token = json.token || json.accessToken || json.access_token;\nif (token) {\n    pm.collectionVariables.set(\"token\", token);\n    console.log(\"Token saved to collection variable\");\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Списки желаний",
+      "item": [
+        {
+          "name": "Получить все списки текущего пользователя",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response body is an array\", function () {\n    const json = pm.response.json();\n    pm.expect(json).to.be.an(\"array\");\n});\n\npm.test(\"Each wishlist has required fields\", function () {\n    const json = pm.response.json();\n    if (json.length > 0) {\n        json.forEach(function(item) {\n            pm.expect(item).to.have.property(\"id\");\n            pm.expect(item).to.have.property(\"title\");\n            pm.expect(item.title).to.be.a(\"string\");\n        });\n    }\n});\n\nconst json = pm.response.json();\nif (json[0].owner.id) {\n    pm.collectionVariables.set(\"userId\", json[0].owner.id);\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/wishlists",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wishlists"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Создать новый список желаний",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\n\npm.test(\"Response body is valid JSON with id\", function () {\n    const json = pm.response.json();\n    pm.expect(json).to.have.property(\"id\");\n    pm.expect(json).to.have.property(\"title\");\n    pm.expect(json.title).to.eql(\"Мой список желаний\");\n});\n\nconst json = pm.response.json();\nif (json.id) {\n    pm.collectionVariables.set(\"wishlistId\", json.id);\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"{{$randomLoremText}}\",\n  \"description\": \"{{$randomLoremText}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wishlists",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wishlists"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Получить список желаний по ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Body contains wishlist fields\", function () {\n    const json = pm.response.json();\n    pm.expect(json).to.have.property(\"id\");\n    pm.expect(json).to.have.property(\"title\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/wishlists/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wishlists",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{wishlistId}}",
+                  "description": "UUID списка желаний"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Обновить список желаний",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response body reflects updated data\", function () {\n    const json = pm.response.json();\n    pm.expect(json.title).to.eql(\"Обновлённое название\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Обновлённое название\",\n  \"description\": \"Новое описание\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wishlists/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wishlists",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{wishlistId}}",
+                  "description": "UUID списка желаний"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Удалить список желаний",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/wishlists/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wishlists",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{wishlistId}}",
+                  "description": "UUID списка желаний"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Получить списки желаний пользователя по ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response body is an array\", function () {\n    pm.expect(pm.response.json()).to.be.an(\"array\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/wishlists/user/:userId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wishlists",
+                "user",
+                ":userId"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "description": "UUID пользователя"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Подарки",
+      "item": [
+        {
+          "name": "Получить все подарки в списке желаний",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response body is an array of gifts\", function () {\n    const json = pm.response.json();\n    pm.expect(json).to.be.an(\"array\");\n    if (json.length > 0) {\n        json.forEach(function(gift) {\n            pm.expect(gift).to.have.property(\"id\");\n            pm.expect(gift).to.have.property(\"name\");\n            pm.expect(gift).to.have.property(\"reserved\");\n            pm.expect(gift.reserved).to.be.a(\"boolean\");\n        });\n    }\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/gifts/wishlist/:wishListId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "gifts",
+                "wishlist",
+                ":wishListId"
+              ],
+              "variable": [
+                {
+                  "key": "wishListId",
+                  "value": "{{wishlistId}}",
+                  "description": "UUID списка желаний"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Создать новый подарок",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response body contains created gift\", function () {\n    const json = pm.response.json();\n    pm.expect(json).to.have.property(\"id\");\n    pm.expect(json).to.have.property(\"name\");\n    pm.expect(json.name).to.eql(\"Новый подарок\");\n    pm.expect(json).to.have.property(\"price\");\n    pm.expect(json.price).to.be.a(\"number\");\n    pm.expect(json).to.have.property(\"reserved\");\n    pm.expect(json.reserved).to.be.false;\n});\n\nconst json = pm.response.json();\nif (json.id) {\n    pm.collectionVariables.set(\"giftId\", json.id);\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Новый подарок\",\n  \"description\": \"Описание подарка\",\n  \"imageUrl\": \"https://example.com/image.jpg\",\n  \"price\": 1500,\n  \"storeUrl\": \"https://example.com/store\",\n  \"reserved\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/gifts/wishlist/:wishListId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "gifts",
+                "wishlist",
+                ":wishListId"
+              ],
+              "variable": [
+                {
+                  "key": "wishListId",
+                  "value": "{{wishlistId}}",
+                  "description": "UUID списка желаний"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Получить подарок по ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Body contains gift fields\", function () {\n    const json = pm.response.json();\n    pm.expect(json).to.have.property(\"id\");\n    pm.expect(json).to.have.property(\"name\");\n    pm.expect(json).to.have.property(\"reserved\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/gifts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "gifts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{giftId}}",
+                  "description": "UUID подарка"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Обновить подарок",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response body reflects updated gift\", function () {\n    const json = pm.response.json();\n    pm.expect(json.name).to.eql(\"Обновлённый подарок\");\n    pm.expect(json.price).to.eql(2000);\n    pm.expect(json.reserved).to.be.true;\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Обновлённый подарок\",\n  \"description\": \"Новое описание\",\n  \"imageUrl\": \"https://example.com/new-image.jpg\",\n  \"price\": 2000,\n  \"storeUrl\": \"https://example.com/new-store\",\n  \"reserved\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/gifts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "gifts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{giftId}}",
+                  "description": "UUID подарка"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Удалить подарок",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/gifts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "gifts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{giftId}}",
+                  "description": "UUID подарка"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Переключить статус зарезервированности подарка",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Body contains reserved flag\", function () {\n    const json = pm.response.json();\n    pm.expect(json).to.have.property(\"reserved\");\n    pm.expect(json.reserved).to.be.a(\"boolean\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/gifts/:id/reserve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "gifts",
+                ":id",
+                "reserve"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{giftId}}",
+                  "description": "UUID подарка"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Пользователи",
+      "item": [
+        {
+          "name": "Получить всех пользователей",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response is an array of users\", function () {\n    const json = pm.response.json();\n    pm.expect(json).to.be.an(\"array\");\n    if (json.length > 0) {\n        json.forEach(function(user) {\n            pm.expect(user).to.have.property(\"id\");\n            pm.expect(user).to.have.property(\"username\");\n            pm.expect(user).to.not.have.property(\"password\");\n        });\n    }\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Получить списки желаний пользователя (user-controller)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Response body is an array\", function () {\n    pm.expect(pm.response.json()).to.be.an(\"array\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:userId/wishlists",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                ":userId",
+                "wishlists"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}",
+                  "description": "UUID пользователя"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.wishlist.otus.kartushin.su"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "wishlistId",
+      "value": ""
+    },
+    {
+      "key": "giftId",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    }
+  ]
+}
