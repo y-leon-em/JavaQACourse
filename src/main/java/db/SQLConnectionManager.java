@@ -13,39 +13,46 @@ public class SQLConnectionManager implements DBConnectionManager {
     DBSettingsReader dbSettingsReader = new DBSettingsReader();
     Map<String, String> settings = dbSettingsReader.getSettings();
 
-    public void sqlConnectionManager() throws SQLException {
-        if (connection == null) {
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
             connection = DriverManager.getConnection(settings.get("URL"), settings.get("USER"),
                     settings.get("PASSWORD"));
         }
-
-
-        if (statement == null) {
-            statement = connection.createStatement();
-        }
+        return connection;
     }
+
+    public Statement getStatement() throws SQLException {
+        Connection conn = getConnection();
+        if (statement == null || statement.isClosed()) {
+            statement = conn.createStatement();
+        }
+        return statement;
+    }
+
     public ResultSet executeQuery(String sql) throws SQLException {
-        return statement.executeQuery(sql);
+        return getStatement().executeQuery(sql);
     }
 
     public ResultSet executeWithData(String sql) throws SQLException {
-        return statement.executeQuery(sql);
+        return getStatement().executeQuery(sql);
     }
 
     public int executeUpdate(String sql) throws SQLException {
-        return statement.executeUpdate(sql);
+        return getStatement().executeUpdate(sql);
     }
 
     public void execute(String sqlRequest) throws SQLException {
-        statement.execute(sqlRequest);
+        getStatement().execute(sqlRequest);
     }
 
     public void close() throws SQLException {
         if (statement != null) {
             statement.close();
+            statement = null;
         }
         if (connection != null) {
             connection.close();
+            connection = null;
         }
     }
 }

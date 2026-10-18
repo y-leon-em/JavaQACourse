@@ -3,7 +3,9 @@ package service;
 public enum Menu {
     ADD,
     UPDATE,
+    DELETE,
     LIST,
+    FILTER,
     EXIT;
 
     public static Menu fromString(String input) {

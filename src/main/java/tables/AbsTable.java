@@ -1,24 +1,26 @@
 package tables;
 
-import animals.Animal;
-import db.DBConnectionManager;
-import factory.DBFactory;
-
 import java.util.List;
 
-public class AbsTable {
+public abstract class AbsTable<T> {
 
-    private String tableName;
-
-    private DBConnectionManager dbConnectionManager;
+    protected final String tableName;
 
     public AbsTable(String tableName) {
-        this.dbConnectionManager = new DBFactory().getDBConnectionManager("mysql");
         this.tableName = tableName;
     }
-    public List<T> list(){
-        dbConnectionManager.executeWithData(String.format("select * from table %s", tableName));
 
-        return List.of();
-    }
+    public abstract void create() throws Exception;
+
+    public abstract void save(T entity) throws Exception;
+
+    public abstract List<T> list() throws Exception;
+
+    public abstract void update(T entity) throws Exception;
+
+    public abstract void delete(int id) throws Exception;
+
+    public abstract T findById(int id) throws Exception;
+
+    public abstract List<T> findByType(String type) throws Exception;
 }

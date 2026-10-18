@@ -1,11 +1,18 @@
 package db;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public interface DBConnectionManager {
-    public void execute(String sqlRequest) throws SQLException;
+    void execute(String sqlRequest) throws SQLException;
 
-    public void close() throws SQLException;
-    public ResultSet executeWithData(String sql) throws SQLException ;
+    void close() throws SQLException;
+
+    ResultSet executeWithData(String sql) throws SQLException;
+
+    Connection getConnection() throws SQLException;
+
+    Statement getStatement() throws SQLException;
 }

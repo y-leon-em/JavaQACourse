@@ -4,6 +4,10 @@ import animals.Animal;
 import animals.properties.Color;
 
 public class Dog extends Animal {
+    public Dog() {
+        super();
+    }
+
     public Dog(String name, int age, double weight, String color) {
         super();
         setName(name);
